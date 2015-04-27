@@ -1,0 +1,96 @@
+//task to delete the old jar
+task deleteOldJar(type: Delete) {
+    delete 'build/libs/AndroidPlugin.jar'
+}
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmmss')
+    return formattedDate
+}
+
+
+//task to export contents as jar
+task exportJar(type: Copy) {
+	if (!file('../../../../dist/classes.jar').exists()){
+    from('build/intermediates/bundles/release/')
+    into('../../../../dist/')
+    include('classes.jar')
+    ///Give whatever name you want to give
+    rename('classes.jar', 'abc.jar')
+	}
+}
+
+task makeBackup(type: Copy){
+   if (file('../../../../dist/abc.jar').exists()){
+		from('../../../../dist/')
+		into('../../../../backup/backupJar/backup'+getDate()+'/')
+		include('abc.jar')
+	}
+}
+
+task deleteJar(type: Delete){
+	delete '../../../../dist/abc.jar'
+}
+
+exportJar.dependsOn(deleteOldJar)
+deleteJar.dependsOn(makeBackup)
+
+//For AAR
+//task to export contents as jar
+task exportAAR(type: Copy) {
+	if (!file('../../../../dist/CARiskMinder.aar').exists()){
+    from('build/outputs/aar/')
+    into('../../../../dist/')
+    include('CARiskMinder-release.aar')
+    rename('CARiskMinder-release.aar', 'CARiskMinder.aar')
+	}
+}
+
+task makeBackupAAR(type: Copy){
+   if (file('../../../../dist/CARiskMinder.aar').exists()){
+		from('../../../../dist/')
+		into('../../../../backup/backupAAR/backup'+getDate()+'/')
+		include('CARiskMinder.aar')
+	}
+}
+
+task deleteAAR(type: Delete){
+	delete '../../../../dist/CARiskMinder.aar'
+}
+
+deleteJar.dependsOn(makeBackupAAR)
+
+//task to copy log file
+task copyLog(type: Copy){
+	if (file('logs.txt').exists()){
+		from('/')
+		into('../../../../logs/')
+		include('logs.txt')
+		rename('logs.txt', 'logs'+getDate()+'.txt')
+	}
+}
+
+task deleteLog(type: Delete){
+	if (file('logs.txt').exists()){
+		delete 'logs.txt'
+	}
+}
+
+deleteLog.dependsOn(copyLog)
+
+task distZip << {
+    ant.zip(destfile: '../../../../dist.zip') {
+        fileset(dir: '../../../../dist/') {
+            include(name: '*.*')
+        }
+    }
+}
+
+task deleteZip(type: Delete){
+	if (file('../../../../dist.zip').exists()){
+		delete '../../../../dist.zip'
+	}
+}
+
+distZip.dependsOn(deleteZip)
