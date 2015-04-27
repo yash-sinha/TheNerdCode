@@ -39,24 +39,24 @@ deleteJar.dependsOn(makeBackup)
 //For AAR
 //task to export contents as jar
 task exportAAR(type: Copy) {
-	if (!file('../../../../dist/CARiskMinder.aar').exists()){
+	if (!file('../../../../dist/abc.aar').exists()){
     from('build/outputs/aar/')
     into('../../../../dist/')
-    include('CARiskMinder-release.aar')
-    rename('CARiskMinder-release.aar', 'CARiskMinder.aar')
+    include('abc-release.aar')
+    rename('abc-release.aar', 'abc.aar')
 	}
 }
 
 task makeBackupAAR(type: Copy){
-   if (file('../../../../dist/CARiskMinder.aar').exists()){
+   if (file('../../../../dist/abc.aar').exists()){
 		from('../../../../dist/')
 		into('../../../../backup/backupAAR/backup'+getDate()+'/')
-		include('CARiskMinder.aar')
+		include('abc.aar')
 	}
 }
 
 task deleteAAR(type: Delete){
-	delete '../../../../dist/CARiskMinder.aar'
+	delete '../../../../dist/abc.aar'
 }
 
 deleteJar.dependsOn(makeBackupAAR)
